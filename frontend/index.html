@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>মাদ্রাসা/স্কুল ম্যানেজমেন্ট সিস্টেম</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="loginScreen">
+  <div class="loginBox">
+    <h1>🕌 প্রতিষ্ঠান ব্যবস্থাপনা সফটওয়্যার</h1>
+    <p>আপনি কোন হিসেবে প্রবেশ করছেন তা নির্বাচন করুন</p>
+    <select id="roleSelect">
+      <option value="admin">অ্যাডমিন / প্রশাসন</option>
+      <option value="teacher">শিক্ষক</option>
+      <option value="parent">অভিভাবক</option>
+    </select>
+    <input id="loginName" placeholder="আপনার নাম লিখুন">
+    <button onclick="doLogin()">প্রবেশ করুন</button>
+    <p class="tag-note">নিশ্চিত করুন ব্যাকএন্ড সার্ভার (backend) চালু আছে, নাহলে তথ্য লোড হবে না।</p>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app">
+<div class="shell">
+  <div class="sidebar">
+    <div class="brand">🕌 ইনস্টিটিউট ERP</div>
+    <nav id="navMenu"></nav>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div class="who">লগইন: <b id="whoName"></b> (<span id="whoRole"></span>)</div>
+      <button onclick="logout()">লগআউট</button>
+    </div>
+    <div class="content" id="content">
+
+      <!-- DASHBOARD -->
+      <div class="page" id="page-dashboard">
+        <h2 class="pageTitle">📊 ড্যাশবোর্ড</h2>
+        <div class="grid" id="dashStats"></div>
+        <div class="panel">
+          <h3>গত ৭ দিনের উপস্থিতির হার (%)</h3>
+          <div class="barChart" id="attChart"></div>
+        </div>
+        <div class="panel">
+          <h3>সাম্প্রতিক নোটিশ</h3>
+          <div id="dashNotices"></div>
+        </div>
+      </div>
+
+      <!-- STUDENTS -->
+      <div class="page" id="page-students">
+        <h2 class="pageTitle">🎓 শিক্ষার্থী ব্যবস্থাপনা</h2>
+        <div class="panel">
+          <h3 id="studentFormTitle">নতুন শিক্ষার্থী ভর্তি</h3>
+          <input type="hidden" id="stuEditId">
+          <div class="formGrid">
+            <div><label>নাম</label><input id="stuName"></div>
+            <div><label>পিতার নাম</label><input id="stuFather"></div>
+            <div><label>মাতার নাম</label><input id="stuMother"></div>
+            <div><label>শ্রেণি/মারহালা</label><input id="stuClass" placeholder="যেমনঃ হিফজ-২, দাখিল ৯ম"></div>
+            <div><label>রোল নম্বর</label><input id="stuRoll"></div>
+            <div><label>মোবাইল নম্বর</label><input id="stuPhone"></div>
+            <div><label>ভর্তির তারিখ</label><input type="date" id="stuDate"></div>
+            <div><label>অবস্থা</label>
+              <select id="stuStatus"><option>সক্রিয়</option><option>টিসি/স্থানান্তরিত</option></select>
+            </div>
+          </div>
+          <div class="flexEnd">
+            <button class="btn secondary" onclick="resetStudentForm()">রিসেট</button>
+            <button class="btn" onclick="saveStudent()">সংরক্ষণ করুন</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="searchRow">
+            <input id="stuSearch" placeholder="নাম/রোল দিয়ে খুঁজুন" oninput="renderStudents()">
+            <select id="stuClassFilter" onchange="renderStudents()"><option value="">সকল শ্রেণি</option></select>
+          </div>
+          <table>
+            <thead><tr><th>রোল</th><th>নাম</th><th>শ্রেণি</th><th>পিতার নাম</th><th>মোবাইল</th><th>অবস্থা</th><th>একশন</th></tr></thead>
+            <tbody id="studentsTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TEACHERS -->
+      <div class="page" id="page-teachers">
+        <h2 class="pageTitle">👨‍🏫 শিক্ষক ব্যবস্থাপনা</h2>
+        <div class="panel">
+          <input type="hidden" id="teaEditId">
+          <div class="formGrid">
+            <div><label>নাম</label><input id="teaName"></div>
+            <div><label>বিষয়/বিভাগ</label><input id="teaSubject"></div>
+            <div><label>মোবাইল নম্বর</label><input id="teaPhone"></div>
+            <div><label>যোগদানের তারিখ</label><input type="date" id="teaJoin"></div>
+            <div><label>মাসিক বেতন (৳)</label><input type="number" id="teaSalary"></div>
+          </div>
+          <div class="flexEnd">
+            <button class="btn secondary" onclick="resetTeacherForm()">রিসেট</button>
+            <button class="btn" onclick="saveTeacher()">সংরক্ষণ করুন</button>
+          </div>
+        </div>
+        <div class="panel">
+          <table>
+            <thead><tr><th>নাম</th><th>বিষয়</th><th>মোবাইল</th><th>যোগদান</th><th>বেতন</th><th>একশন</th></tr></thead>
+            <tbody id="teachersTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ATTENDANCE -->
+      <div class="page" id="page-attendance">
+        <h2 class="pageTitle">🗓️ উপস্থিতি</h2>
+        <div class="panel">
+          <div class="formGrid">
+            <div><label>তারিখ</label><input type="date" id="attDate"></div>
+            <div><label>শ্রেণি</label><select id="attClass" onchange="loadAttendanceTable()"></select></div>
+          </div>
+          <table>
+            <thead><tr><th>রোল</th><th>নাম</th><th>উপস্থিতি</th></tr></thead>
+            <tbody id="attTbody"></tbody>
+          </table>
+          <div class="flexEnd"><button class="btn" onclick="saveAttendance()">উপস্থিতি সংরক্ষণ করুন</button></div>
+        </div>
+      </div>
+
+      <!-- FEES -->
+      <div class="page" id="page-fees">
+        <h2 class="pageTitle">💰 ফি ও হিসাব ব্যবস্থাপনা</h2>
+        <div class="panel">
+          <h3>নতুন ফি এন্ট্রি</h3>
+          <div class="formGrid">
+            <div><label>শিক্ষার্থী</label><select id="feeStudent"></select></div>
+            <div><label>ফি এর ধরন</label>
+              <select id="feeType"><option>মাসিক বেতন</option><option>ভর্তি ফি</option><option>পরীক্ষা ফি</option><option>হোস্টেল ফি</option><option>পরিবহন ফি</option></select>
+            </div>
+            <div><label>টাকার পরিমাণ (৳)</label><input type="number" id="feeAmount"></div>
+            <div><label>মাস/বিবরণ</label><input id="feeMonth" placeholder="যেমনঃ জানুয়ারি ২০২৬"></div>
+            <div><label>পরিশোধের মাধ্যম</label>
+              <select id="feeMethod"><option>নগদ</option><option>বিকাশ</option><option>নগদ (Nagad)</option><option>রকেট</option><option>ব্যাংক</option></select>
+            </div>
+            <div><label>অবস্থা</label><select id="feeStatus"><option>পরিশোধিত</option><option>বকেয়া</option></select></div>
+          </div>
+          <div class="flexEnd"><button class="btn" onclick="saveFee()">সংরক্ষণ করুন</button></div>
+        </div>
+        <div class="panel">
+          <div class="searchRow">
+            <select id="feeFilterStatus" onchange="renderFees()">
+              <option value="">সব দেখুন</option><option>পরিশোধিত</option><option>বকেয়া</option>
+            </select>
+          </div>
+          <table>
+            <thead><tr><th>শিক্ষার্থী</th><th>ধরন</th><th>বিবরণ</th><th>পরিমাণ</th><th>মাধ্যম</th><th>অবস্থা</th><th>একশন</th></tr></thead>
+            <tbody id="feesTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- EXAMS -->
+      <div class="page" id="page-exams">
+        <h2 class="pageTitle">📝 পরীক্ষা ও ফলাফল ব্যবস্থাপনা</h2>
+        <div class="panel">
+          <h3>নতুন পরীক্ষা</h3>
+          <div class="formGrid">
+            <div><label>পরীক্ষার নাম</label><input id="examName" placeholder="যেমনঃ অর্ধবার্ষিক পরীক্ষা ২০২৬"></div>
+            <div><label>শ্রেণি</label><select id="examClass"></select></div>
+            <div><label>তারিখ</label><input type="date" id="examDate"></div>
+          </div>
+          <div class="flexEnd"><button class="btn" onclick="saveExam()">পরীক্ষা তৈরি করুন</button></div>
+        </div>
+        <div class="panel">
+          <h3>নম্বর এন্ট্রি</h3>
+          <div class="formGrid">
+            <div><label>পরীক্ষা নির্বাচন করুন</label><select id="marksExam" onchange="loadMarksTable()"></select></div>
+            <div><label>বিষয়</label><input id="marksSubject" placeholder="যেমনঃ কুরআন, হাদিস, গণিত"></div>
+            <div><label>পূর্ণমান</label><input type="number" id="marksFull" value="100"></div>
+          </div>
+          <table>
+            <thead><tr><th>রোল</th><th>নাম</th><th>প্রাপ্ত নম্বর</th></tr></thead>
+            <tbody id="marksTbody"></tbody>
+          </table>
+          <div class="flexEnd"><button class="btn" onclick="saveMarks()">নম্বর সংরক্ষণ করুন</button></div>
+        </div>
+        <div class="panel">
+          <h3>ফলাফল শীট / মেধা তালিকা</h3>
+          <div class="formGrid">
+            <div><label>পরীক্ষা নির্বাচন করুন</label><select id="resultExam" onchange="renderResultSheet()"></select></div>
+          </div>
+          <div id="resultSheetWrap"></div>
+        </div>
+      </div>
+
+      <!-- NOTICES -->
+      <div class="page" id="page-notices">
+        <h2 class="pageTitle">📢 নোটিশ বোর্ড</h2>
+        <div class="panel">
+          <div class="formGrid">
+            <div><label>শিরোনাম</label><input id="noticeTitle"></div>
+            <div><label>তারিখ</label><input type="date" id="noticeDate"></div>
+            <div><label>জরুরি?</label><select id="noticeUrgent"><option value="no">না</option><option value="yes">হ্যাঁ</option></select></div>
+          </div>
+          <label>বিস্তারিত</label>
+          <textarea id="noticeBody" rows="3"></textarea>
+          <div class="flexEnd" style="margin-top:10px;"><button class="btn" onclick="saveNotice()">প্রকাশ করুন</button></div>
+        </div>
+        <div class="panel" id="noticesList"></div>
+      </div>
+
+      <!-- DOCUMENTS -->
+      <div class="page" id="page-documents">
+        <h2 class="pageTitle">🖨️ ডকুমেন্ট জেনারেটর (প্রিন্ট)</h2>
+        <div class="panel">
+          <h3>পরিচয়পত্র (ID Card)</h3>
+          <div class="formGrid">
+            <div><label>শিক্ষার্থী নির্বাচন</label><select id="idCardStudent"></select></div>
+          </div>
+          <button class="btn" onclick="printIdCard()">প্রিন্ট করুন</button>
+        </div>
+        <div class="panel">
+          <h3>বেতন রশিদ (Fee Receipt)</h3>
+          <div class="formGrid">
+            <div><label>ফি এন্ট্রি নির্বাচন</label><select id="receiptFee"></select></div>
+          </div>
+          <button class="btn" onclick="printReceipt()">প্রিন্ট করুন</button>
+        </div>
+        <div class="panel">
+          <h3>মার্কশিট</h3>
+          <div class="formGrid">
+            <div><label>পরীক্ষা</label><select id="marksheetExam"></select></div>
+            <div><label>শিক্ষার্থী</label><select id="marksheetStudent"></select></div>
+          </div>
+          <button class="btn" onclick="printMarksheet()">প্রিন্ট করুন</button>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="page" id="page-settings">
+        <h2 class="pageTitle">⚙️ প্রতিষ্ঠানের তথ্য</h2>
+        <div class="panel">
+          <div class="formGrid">
+            <div><label>প্রতিষ্ঠানের নাম</label><input id="setName"></div>
+            <div><label>ঠিকানা</label><input id="setAddress"></div>
+            <div><label>মোবাইল/ফোন</label><input id="setPhone"></div>
+          </div>
+          <div class="flexEnd"><button class="btn" onclick="saveSettings()">সংরক্ষণ করুন</button></div>
+        </div>
+        <div class="panel">
+          <h3>ডেটা ব্যাকআপ</h3>
+          <p class="tag-note">এখন সব তথ্য MongoDB ডেটাবেজে সংরক্ষিত থাকে (আগের মতো ব্রাউজারে নয়) — তাই ব্রাউজার বন্ধ/মুছে ফেললেও তথ্য হারাবে না। তারপরও নিয়মিত ব্যাকআপ রাখা ভালো অভ্যাস।</p>
+          <button class="btn secondary" onclick="exportData()">📥 ব্যাকআপ ডাউনলোড (JSON)</button>
+        </div>
+        <div class="panel">
+          <h3>সার্ভার সংযোগ অবস্থা</h3>
+          <div id="serverStatus" class="tag-note">যাচাই করা হচ্ছে...</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Hidden print area -->
+<div id="printArea"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

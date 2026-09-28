@@ -3,7 +3,11 @@
    ব্যাকএন্ড সার্ভার অন্য পোর্টে (5000) চলে, তাই পুরো ঠিকানা লিখতে হয়।
    হোস্টিং করার সময় শুধু এই লাইনটা বদলালেই হবে।
    ============================================================ */
-const API_BASE = 'http://localhost:5000/api';
+// লোকাল কম্পিউটারে চালালে লোকাল সার্ভার, ইন্টারনেটে লাইভ হলে Render সার্ভার ব্যবহার হবে
+const IS_LOCAL = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const API_BASE = IS_LOCAL
+  ? 'http://localhost:5000/api'
+  : 'https://madrasa-erp-pro.onrender.com/api';
 
 async function api(path, method = 'GET', body = null) {
   const opts = { method, headers: { 'Content-Type': 'application/json' } };
